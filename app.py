@@ -187,58 +187,44 @@ with col2:
         # Get current URL - detect deployment environment
         current_url = "http://localhost:8501"
         
-        # Try multiple methods to detect the actual URL
+        # Simplified URL detection - prioritize secrets
         try:
-            # Method 1: Check Streamlit secrets first (recommended for production)
-            if hasattr(st, 'secrets') and 'APP_URL' in st.secrets:
-                current_url = st.secrets['APP_URL']
+            # Check Streamlit secrets first
+            if hasattr(st, 'secrets') and hasattr(st.secrets, 'get'):
+                app_url = st.secrets.get('APP_URL', None)
+                if app_url:
+                    current_url = str(app_url).strip()
             
-            # Method 2: Check environment variables
+            # Fallback to environment variable
             elif 'APP_URL' in os.environ:
-                current_url = os.environ['APP_URL']
-            
-            # Method 3: Try to detect Streamlit Cloud automatically
-            elif 'STREAMLIT_SERVER_PORT' in os.environ:
-                # We're on Streamlit Cloud, try to construct URL
-                try:
-                    # Get the app name from environment or use a generic one
-                    app_name = os.environ.get('STREAMLIT_APP_NAME', 'vibetheforce')
-                    current_url = f"https://{app_name}.streamlit.app"
-                except:
-                    current_url = "https://vibetheforce.streamlit.app"
-            
-            # Method 4: Check for other cloud indicators
-            elif any(key in os.environ for key in ['HOSTNAME', 'DYNO']) and 'localhost' not in str(os.environ.get('HOSTNAME', '')):
-                # We're likely deployed somewhere
-                current_url = "https://vibetheforce.streamlit.app"  # Default app name
+                current_url = str(os.environ['APP_URL']).strip()
                 
         except Exception as e:
-            # If all methods fail, keep localhost for development
-            current_url = "http://localhost:8501"
+            # Keep localhost as fallback
+            pass
         
-        # Use JavaScript to get the actual current URL
-        st.markdown("""
-        <script>
-        // Get current URL and store it
-        window.currentAppUrl = window.location.origin;
-        </script>
-        """, unsafe_allow_html=True)
+        # Validate and clean the URL
+        if current_url and current_url != "http://localhost:8501":
+            # Clean up the URL
+            current_url = current_url.strip()
+            # Ensure it starts with http:// or https://
+            if not current_url.startswith(('http://', 'https://')):
+                current_url = f"https://{current_url}"
+            # Remove any trailing slashes
+            current_url = current_url.rstrip('/')
+            
+            # Validate it's a proper URL
+            if not ('.' in current_url and len(current_url) > 10):
+                current_url = "http://localhost:8501"  # Fallback to localhost if invalid
         
-        # For Streamlit Cloud, try to detect the URL pattern
-        import os
-        if any(key in os.environ for key in ['STREAMLIT_SERVER_PORT', 'HOSTNAME']) and 'localhost' not in current_url:
-            # We're likely on Streamlit Cloud, try to construct the URL
-            try:
-                # Check if we have a hostname
-                hostname = os.environ.get('HOSTNAME', '')
-                if hostname and 'streamlit' in hostname.lower():
-                    # Construct Streamlit Cloud URL pattern
-                    current_url = f"https://{hostname}.streamlit.app"
-                elif 'streamlit.app' not in current_url:
-                    # Generic Streamlit Cloud URL - user should configure this
-                    current_url = "https://your-app-name.streamlit.app"
-            except:
-                pass
+        # Debug: Show what URL we're using (visible only in non-production)
+        if current_url != "http://localhost:8501":
+            # Show debug info in a small, unobtrusive way
+            st.markdown(f"""
+            <div style="font-size: 0.7rem; color: #666; text-align: center; margin-bottom: 0.5rem;">
+                🔗 {current_url}
+            </div>
+            """, unsafe_allow_html=True)
         
         # Generate QR code with Imperial theme
         qr_buffer = generate_themed_qr_code(current_url, theme='empire')
