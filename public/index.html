@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description"
+        content="Vota il tuo apprezzamento per il talk 'Luke era un VibeCoder?' con una scala Jedi da 1 a 5">
+    <meta name="theme-color" content="#FFE81F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <title>VibeTheForce - Luke era un VibeCoder?</title>
+
+    <!-- Google Fonts for Star Wars theme -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="star-wars-theme">
+    <div id="app">
+        <!-- Header Section -->
+        <header class="app-header">
+            <h1 class="main-title">VibeTheForce</h1>
+            <h2 class="subtitle">Luke era un VibeCoder?</h2>
+            <div class="force-divider"></div>
+
+            <!-- QR Code Section (for presentation mode) -->
+            <div id="qr-code-section" class="qr-code-section hidden">
+                <div class="qr-code-container">
+                    <h3 class="qr-title">Scansiona per votare</h3>
+                    <div class="qr-code-wrapper">
+                        <img id="qr-code-image" src="" alt="QR Code per votare" class="qr-code-image">
+                    </div>
+                    <p class="qr-url" id="qr-url-text"></p>
+                    <button id="toggle-qr-btn" class="toggle-qr-btn">Nascondi QR Code</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Container -->
+        <main class="main-content">
+            <!-- Voting Section -->
+            <section id="voting-section" class="voting-section">
+                <div class="voting-container">
+                    <h3 class="section-title">Esprimi il tuo giudizio Jedi</h3>
+                    <p class="voting-description">Scegli il tuo livello di apprezzamento per il talk</p>
+
+                    <div class="voting-options">
+                        <button class="vote-button" data-rating="1" data-level="youngling">
+                            <div class="vote-stars">⭐</div>
+                            <div class="vote-label">Youngling</div>
+                            <div class="vote-description">Ancora molto da imparare</div>
+                        </button>
+
+                        <button class="vote-button" data-rating="2" data-level="padawan">
+                            <div class="vote-stars">⭐⭐</div>
+                            <div class="vote-label">Padawan</div>
+                            <div class="vote-description">Sulla strada giusta</div>
+                        </button>
+
+                        <button class="vote-button" data-rating="3" data-level="knight">
+                            <div class="vote-stars">⭐⭐⭐</div>
+                            <div class="vote-label">Cavaliere Jedi</div>
+                            <div class="vote-description">Equilibrato nella Forza</div>
+                        </button>
+
+                        <button class="vote-button" data-rating="4" data-level="master">
+                            <div class="vote-stars">⭐⭐⭐⭐</div>
+                            <div class="vote-label">Maestro Jedi</div>
+                            <div class="vote-description">Saggezza e potere</div>
+                        </button>
+
+                        <button class="vote-button" data-rating="5" data-level="grandmaster">
+                            <div class="vote-stars">⭐⭐⭐⭐⭐</div>
+                            <div class="vote-label">Gran Maestro</div>
+                            <div class="vote-description">Uno con la Forza</div>
+                        </button>
+                    </div>
+
+                    <!-- Vote Confirmation -->
+                    <div id="vote-confirmation" class="vote-confirmation hidden">
+                        <div class="confirmation-content">
+                            <div class="confirmation-icon">✨</div>
+                            <h4>Voto inviato!</h4>
+                            <p>La Forza ha registrato il tuo giudizio</p>
+                        </div>
+                    </div>
+
+                    <!-- Already Voted Message -->
+                    <div id="already-voted" class="already-voted hidden">
+                        <div class="already-voted-content">
+                            <div class="already-voted-icon">🌟</div>
+                            <h4>Hai già votato</h4>
+                            <p>Il tuo giudizio Jedi è stato registrato</p>
+                            <button id="view-results-btn" class="view-results-btn">Visualizza Risultati</button>
+                        </div>
+                    </div>
+
+                    <!-- View Results Button (Always Visible) -->
+                    <div class="view-results-container">
+                        <button id="view-results-always-btn" class="view-results-always-btn">
+                            📊 Visualizza Risultati Live
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="results-section hidden">
+                <div class="results-container">
+                    <h3 class="section-title">Risultati in Tempo Reale</h3>
+                    <div class="results-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-votes">0</span>
+                            <span class="stat-label">Voti Totali</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="average-rating">0.0</span>
+                            <span class="stat-label">Media Jedi</span>
+                        </div>
+                    </div>
+
+                    <div class="results-chart">
+                        <div class="chart-item" data-level="grandmaster">
+                            <div class="chart-label">
+                                <span class="chart-stars">⭐⭐⭐⭐⭐</span>
+                                <span class="chart-title">Gran Maestro</span>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar" data-rating="5"></div>
+                                <span class="chart-count" id="count-5">0</span>
+                                <span class="chart-percentage" id="percentage-5">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-item" data-level="master">
+                            <div class="chart-label">
+                                <span class="chart-stars">⭐⭐⭐⭐</span>
+                                <span class="chart-title">Maestro Jedi</span>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar" data-rating="4"></div>
+                                <span class="chart-count" id="count-4">0</span>
+                                <span class="chart-percentage" id="percentage-4">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-item" data-level="knight">
+                            <div class="chart-label">
+                                <span class="chart-stars">⭐⭐⭐</span>
+                                <span class="chart-title">Cavaliere Jedi</span>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar" data-rating="3"></div>
+                                <span class="chart-count" id="count-3">0</span>
+                                <span class="chart-percentage" id="percentage-3">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-item" data-level="padawan">
+                            <div class="chart-label">
+                                <span class="chart-stars">⭐⭐</span>
+                                <span class="chart-title">Padawan</span>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar" data-rating="2"></div>
+                                <span class="chart-count" id="count-2">0</span>
+                                <span class="chart-percentage" id="percentage-2">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-item" data-level="youngling">
+                            <div class="chart-label">
+                                <span class="chart-stars">⭐</span>
+                                <span class="chart-title">Youngling</span>
+                            </div>
+                            <div class="chart-bar-container">
+                                <div class="chart-bar" data-rating="1"></div>
+                                <span class="chart-count" id="count-1">0</span>
+                                <span class="chart-percentage" id="percentage-1">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="back-to-vote-btn" class="back-to-vote-btn">Torna al Voto</button>
+                    <button id="show-qr-from-results-btn" class="show-qr-btn">Mostra QR Code</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Floating QR Code Button (for easy access) -->
+        <button id="floating-qr-btn" class="floating-qr-btn" title="Mostra QR Code">
+            <span class="qr-icon">📱</span>
+        </button>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p>La Forza sta elaborando...</p>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="error-message hidden">
+            <div class="error-content">
+                <div class="error-icon">⚠️</div>
+                <h4>Disturbo nella Forza</h4>
+                <p id="error-text">Si è verificato un errore. Riprova.</p>
+                <button id="retry-btn" class="retry-btn">Riprova</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

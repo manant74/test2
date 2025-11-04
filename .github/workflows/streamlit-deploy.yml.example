@@ -1,0 +1,52 @@
+# Optional GitHub Actions workflow for automated checks
+# Rename to streamlit-deploy.yml to enable
+# This workflow runs basic checks on every push
+
+name: Streamlit App Checks
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run verification script
+      run: python verify_deployment_ready.py
+    
+    - name: Check Python syntax
+      run: |
+        python -m py_compile app.py
+        python -m py_compile database/db_manager.py
+        python -m py_compile services/*.py
+        python -m py_compile pages/*.py
+        python -m py_compile utils/*.py
+    
+    - name: Verify Streamlit config
+      run: |
+        test -f .streamlit/config.toml
+        test -f .streamlit/secrets.toml.example
+    
+    - name: Check for secrets in code
+      run: |
+        ! grep -r "AIza" --include="*.py" . || (echo "Found API key in code!" && exit 1)
+        echo "No hardcoded secrets found"
+
+# Note: This workflow does NOT deploy the app
+# Streamlit Cloud handles deployment automatically when you push to GitHub
