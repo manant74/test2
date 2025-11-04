@@ -34,13 +34,57 @@ def apply_star_wars_theme():
     /* Import Star Wars inspired font */
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     
-    /* Main app background with deep space black and starfield */
+    /* Main app background with deep space black and animated starfield */
     .stApp {
         background: 
-            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
-            linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            /* Animated stars */
+            radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+            radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+            radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+            radial-gradient(2px 2px at 160px 30px, #ddd, transparent),
+            /* More stars */
+            radial-gradient(1px 1px at 200px 90px, #fff, transparent),
+            radial-gradient(1px 1px at 240px 50px, rgba(255,255,255,0.7), transparent),
+            radial-gradient(2px 2px at 280px 10px, #eee, transparent),
+            radial-gradient(1px 1px at 320px 70px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 360px 40px, #fff, transparent),
+            /* Additional scattered stars */
+            radial-gradient(1px 1px at 50px 120px, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 100px 150px, #fff, transparent),
+            radial-gradient(2px 2px at 150px 100px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 250px 140px, #ddd, transparent),
+            radial-gradient(1px 1px at 300px 120px, rgba(255,255,255,0.7), transparent),
+            /* Base gradient */
+            linear-gradient(135deg, #000000 0%, #0a0a0a 25%, #1a1a2e 50%, #16213e 75%, #000000 100%);
+        background-size: 400px 200px, 400px 200px, 400px 200px, 400px 200px, 400px 200px,
+                         400px 200px, 400px 200px, 400px 200px, 400px 200px, 400px 200px,
+                         400px 200px, 400px 200px, 400px 200px, 400px 200px, 400px 200px,
+                         100% 100%;
+        animation: starfield 120s linear infinite;
+    }
+    
+    /* Starfield animation */
+    @keyframes starfield {
+        0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+        100% { background-position: -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, -400px 0, 0 0; }
+    }
+    
+    /* Streamlit header styling to match the theme */
+    header[data-testid="stHeader"] {
+        background: linear-gradient(135deg, #000000 0%, #0a0a0a 25%, #1a1a2e 50%, #16213e 75%, #000000 100%) !important;
+        border-bottom: 1px solid #333333;
+        height: 60px;
+    }
+    
+    /* Streamlit toolbar styling */
+    .stToolbar {
+        background: transparent !important;
+    }
+    
+    /* Main header container */
+    [data-testid="stHeader"] > div {
+        background: transparent !important;
     }
     
     /* Button styling with Imperial gray/white theme */
@@ -207,6 +251,56 @@ def apply_star_wars_theme():
     
     .main .block-container {
         animation: fadeIn 0.5s ease-in;
+    }
+    
+    /* Twinkling stars effect */
+    .stApp::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(1px 1px at 25px 25px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 75px 75px, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 125px 125px, rgba(255,255,255,0.9), transparent),
+            radial-gradient(1px 1px at 175px 175px, rgba(255,255,255,0.7), transparent),
+            radial-gradient(1px 1px at 225px 225px, rgba(255,255,255,0.8), transparent);
+        background-size: 250px 250px;
+        animation: twinkle 4s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    @keyframes twinkle {
+        0% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+        100% { opacity: 0.3; }
+    }
+    
+    /* Additional distant stars layer */
+    .stApp::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(0.5px 0.5px at 50px 100px, rgba(255,255,255,0.4), transparent),
+            radial-gradient(0.5px 0.5px at 150px 200px, rgba(255,255,255,0.3), transparent),
+            radial-gradient(0.5px 0.5px at 300px 50px, rgba(255,255,255,0.5), transparent),
+            radial-gradient(0.5px 0.5px at 400px 150px, rgba(255,255,255,0.3), transparent);
+        background-size: 500px 300px;
+        animation: slowTwinkle 8s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: -2;
+    }
+    
+    @keyframes slowTwinkle {
+        0% { opacity: 0.2; }
+        100% { opacity: 0.6; }
     }
     </style>
     """, unsafe_allow_html=True)

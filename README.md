@@ -126,10 +126,23 @@ Streamlit Cloud si aggiorna automaticamente ad ogni push su GitHub!
 
 L'applicazione genera automaticamente un QR Code per facilitare l'accesso:
 
-- Disponibile nella pagina Admin (3_⚙️_Admin.py)
-- Colori personalizzati Star Wars (#FFE81F su #000428)
+- Disponibile nella home page e nella pagina Admin
+- Colori personalizzati Star Wars (tema Imperial: nero su bianco)
 - Ideale per proiettare durante la conference
 - I partecipanti possono scansionare per votare istantaneamente
+
+### Configurazione URL per QR Code
+
+Per il deployment su Streamlit Cloud, configura l'URL corretto:
+
+1. Crea il file `.streamlit/secrets.toml`:
+```toml
+APP_URL = "https://your-app-name.streamlit.app"
+```
+
+2. Oppure imposta la variabile d'ambiente `APP_URL`
+
+3. Il QR Code punterà automaticamente all'URL corretto
 
 ## 🎨 Scala di Valutazione Star Wars
 

@@ -184,23 +184,61 @@ with col2:
     """, unsafe_allow_html=True)
     
     try:
-        # Get current URL - try multiple methods
+        # Get current URL - detect deployment environment
         current_url = "http://localhost:8501"
         
-        # Try to get from Streamlit context
+        # Try multiple methods to detect the actual URL
         try:
-            # Check if we're in a deployed environment
-            if hasattr(st, 'secrets') and 'STREAMLIT_SHARING_URL' in st.secrets:
-                current_url = st.secrets['STREAMLIT_SHARING_URL']
-            else:
-                # For local development, try to get the actual port
-                import streamlit.web.server.server as server
-                if hasattr(server, 'Server') and server.Server._singleton:
-                    port = getattr(server.Server._singleton, '_port', 8501)
-                    current_url = f"http://localhost:{port}"
-        except:
-            # Fallback to default
+            # Method 1: Check Streamlit secrets first (recommended for production)
+            if hasattr(st, 'secrets') and 'APP_URL' in st.secrets:
+                current_url = st.secrets['APP_URL']
+            
+            # Method 2: Check environment variables
+            elif 'APP_URL' in os.environ:
+                current_url = os.environ['APP_URL']
+            
+            # Method 3: Try to detect Streamlit Cloud automatically
+            elif 'STREAMLIT_SERVER_PORT' in os.environ:
+                # We're on Streamlit Cloud, try to construct URL
+                try:
+                    # Get the app name from environment or use a generic one
+                    app_name = os.environ.get('STREAMLIT_APP_NAME', 'vibetheforce')
+                    current_url = f"https://{app_name}.streamlit.app"
+                except:
+                    current_url = "https://vibetheforce.streamlit.app"
+            
+            # Method 4: Check for other cloud indicators
+            elif any(key in os.environ for key in ['HOSTNAME', 'DYNO']) and 'localhost' not in str(os.environ.get('HOSTNAME', '')):
+                # We're likely deployed somewhere
+                current_url = "https://vibetheforce.streamlit.app"  # Default app name
+                
+        except Exception as e:
+            # If all methods fail, keep localhost for development
             current_url = "http://localhost:8501"
+        
+        # Use JavaScript to get the actual current URL
+        st.markdown("""
+        <script>
+        // Get current URL and store it
+        window.currentAppUrl = window.location.origin;
+        </script>
+        """, unsafe_allow_html=True)
+        
+        # For Streamlit Cloud, try to detect the URL pattern
+        import os
+        if any(key in os.environ for key in ['STREAMLIT_SERVER_PORT', 'HOSTNAME']) and 'localhost' not in current_url:
+            # We're likely on Streamlit Cloud, try to construct the URL
+            try:
+                # Check if we have a hostname
+                hostname = os.environ.get('HOSTNAME', '')
+                if hostname and 'streamlit' in hostname.lower():
+                    # Construct Streamlit Cloud URL pattern
+                    current_url = f"https://{hostname}.streamlit.app"
+                elif 'streamlit.app' not in current_url:
+                    # Generic Streamlit Cloud URL - user should configure this
+                    current_url = "https://your-app-name.streamlit.app"
+            except:
+                pass
         
         # Generate QR code with Imperial theme
         qr_buffer = generate_themed_qr_code(current_url, theme='empire')
@@ -208,13 +246,21 @@ with col2:
         # Convert to base64 for display
         qr_base64 = base64.b64encode(qr_buffer.getvalue()).decode()
         
-        # Display QR code centered without URL
+        # Display QR code centered
         st.markdown(f"""
         <div style="background: white; padding: 1rem; border-radius: 10px; margin: 1rem auto; display: flex; justify-content: center; align-items: center;">
             <img src="data:image/png;base64,{qr_base64}" style="max-width: 200px; height: auto; display: block;">
         </div>
     </div>
         """, unsafe_allow_html=True)
+        
+        # Show URL info only in development
+        if current_url == "http://localhost:8501":
+            st.markdown("""
+            <div style="font-size: 0.7rem; color: #888; text-align: center; margin-top: 0.5rem;">
+                💡 Sviluppo locale - Configura APP_URL per produzione
+            </div>
+            """, unsafe_allow_html=True)
         
     except Exception as e:
         st.markdown("""
