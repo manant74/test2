@@ -5,6 +5,9 @@ votes.db
 # Streamlit secrets
 .streamlit/secrets.toml
 
+# Deploy instructions (contains sensitive examples)
+DEPLOY_INSTRUCTIONS.md
+
 # Python
 __pycache__/
 *.py[cod]
