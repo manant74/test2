@@ -7,6 +7,7 @@ votes.db
 
 # Deploy instructions (contains sensitive examples)
 DEPLOY_INSTRUCTIONS.md
+DEPLOY_GUIDE.md
 
 # Python
 __pycache__/
